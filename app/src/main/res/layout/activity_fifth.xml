@@ -9,7 +9,7 @@
         android:id="@+id/fifthText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Archivio personale (Canzonc salvate, ecc."
+        android:text="Archivio personale (Canzoni salvate, ecc.)"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"

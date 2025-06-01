@@ -1,28 +1,79 @@
 package com.example.myrestapp
 
 import android.os.Bundle
-import android.widget.TextView
+import android.util.Log
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import okhttp3.*
+import org.json.JSONObject
+import java.io.IOException
 
 class ThirdActivity : AppCompatActivity() {
+
+    private lateinit var listView: ListView
+    private lateinit var searchInput: EditText
+    private val client = OkHttpClient()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_third)
 
-        val textView = findViewById<TextView>(R.id.songsTextView)
+        listView = findViewById(R.id.listViewSongs)
+        searchInput = findViewById(R.id.editTextSearch)
 
-        val canzoni = listOf(
-            "Bohemian Rhapsody – Queen",
-            "Imagine – John Lennon",
-            "Smells Like Teen Spirit – Nirvana",
-            "Billie Jean – Michael Jackson",
-            "Hey Jude – The Beatles",
-            "Shake It Off – Taylor Swift",
-            "Blinding Lights – The Weeknd"
-        )
+        searchInput.setOnEditorActionListener { v, actionId, event ->
+            val query = searchInput.text.toString()
+            if (query.isNotEmpty()) {
+                fetchSongs(query)
+            }
+            true
+        }
+    }
 
-        textView.text = canzoni.joinToString("\n\n")
+    private fun fetchSongs(query: String) {
+        val url = "https://itunes.apple.com/search?term=${query.replace(" ", "+")}&media=music"
+
+        val request = Request.Builder().url(url).build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    Toast.makeText(this@ThirdActivity, "Errore di rete", Toast.LENGTH_SHORT).show()
+                }
+                Log.e("API", "Errore: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val json = response.body?.string()
+                val results = mutableListOf<String>()
+
+                try {
+                    val jsonObject = JSONObject(json!!)
+                    val jsonArray = jsonObject.getJSONArray("results")
+
+                    for (i in 0 until jsonArray.length()) {
+                        val item = jsonArray.getJSONObject(i)
+                        val title = item.getString("trackName")
+                        val artist = item.getString("artistName")
+                        results.add("$title – $artist")
+                    }
+
+                    runOnUiThread {
+                        val adapter = ArrayAdapter(this@ThirdActivity, android.R.layout.simple_list_item_1, results)
+                        listView.adapter = adapter
+                    }
+
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        Toast.makeText(this@ThirdActivity, "Errore nel parsing dei dati", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
     }
 }
+
 
 

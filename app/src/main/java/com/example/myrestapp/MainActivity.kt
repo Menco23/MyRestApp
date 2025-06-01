@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
             val user = username.text.toString()
             val pass = password.text.toString()
 
-            if (user == "admin" && pass == "admin") {
+            if (user == "admin" && pass == "1234") {
                 val intent = Intent(this, SecondActivity::class.java)
                 startActivity(intent)
                 finish()
