@@ -1,4 +1,4 @@
-#  MyRestApp - Music REST Client
+#  MyRestApp
 
 **MyRestApp** è un'app Android che consente di cercare brani musicali tramite l'API di iTunes. L'accesso all'app è protetto da un semplice login. L’interfaccia è suddivisa in più schermate (Activity) che gestiscono ricerca, streaming e archivio.
 
